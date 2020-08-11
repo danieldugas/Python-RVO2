@@ -575,6 +575,11 @@ namespace RVO {
 		 */
 		void setTimeStep(float timeStep);
 
+		/**
+		 * \brief      Clears all agents from the simulator, but retains obstacles.
+		 */
+		void clearAgents();
+
 	private:
 		std::vector<Agent *> agents_;
 		Agent *defaultAgent_;

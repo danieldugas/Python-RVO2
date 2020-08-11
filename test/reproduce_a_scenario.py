@@ -4,11 +4,6 @@ import numpy as np
 def reproduce_test_scenario(plotting=False):
     sim = rvo2.PyRVOSimulator(1/60., 1.5, 5, 1.5, 2, 0.4, 2)
 
-    a0 = sim.addAgent((-1, -1))
-    a1 = sim.addAgent((1, -1))
-    a2 = sim.addAgent((1, 1))
-    a3 = sim.addAgent((-1, 1), 1.5, 5, 1.5, 2, 0.4, 2, (0, 0))
-
     obstacles = [
         [(0.3, 0.1), (0.1, 0.1), (0.1, -0.1)]
     ]
@@ -16,17 +11,18 @@ def reproduce_test_scenario(plotting=False):
         sim.addObstacle(obstacle)
     sim.processObstacles()
 
+    a0 = sim.addAgent((-1, -1))
+    a1 = sim.addAgent((1, -1))
+    a2 = sim.addAgent((1, 1))
+    a3 = sim.addAgent((-1, 1), 1.5, 5, 1.5, 2, 0.4, 2, (0, 0))
     sim.setAgentPrefVelocity(a0, (1, 1))
     sim.setAgentPrefVelocity(a1, (-1, 1))
     sim.setAgentPrefVelocity(a2, (-1, -1))
     sim.setAgentPrefVelocity(a3, (1, -1))
 
-    print('Running simulation')
-
     positions_log = []
     for step in range(200):
         sim.doStep()
-
         positions = [sim.getAgentPosition(agent_no) for agent_no in (a0, a1, a2, a3)]
         positions_log.append(positions)
 
@@ -50,6 +46,66 @@ def reproduce_test_scenario(plotting=False):
         print("Test failed!")
     return test_passed
 
+def test_clear_agents(plotting=False):
+    sim = rvo2.PyRVOSimulator(1/60., 1.5, 5, 1.5, 2, 0.4, 2)
+
+    obstacles = [
+        [(0.3, 0.1), (0.1, 0.1), (0.1, -0.1)]
+    ]
+    for obstacle in obstacles:
+        sim.addObstacle(obstacle)
+    sim.processObstacles()
+
+    a0 = sim.addAgent((-1, -1))
+    a1 = sim.addAgent((1, -1))
+    a2 = sim.addAgent((1, 1))
+    a3 = sim.addAgent((-1, 1), 1.5, 5, 1.5, 2, 0.4, 2, (0, 0))
+    sim.setAgentPrefVelocity(a0, (1, 1))
+    sim.setAgentPrefVelocity(a1, (-1, 1))
+    sim.setAgentPrefVelocity(a2, (-1, -1))
+    sim.setAgentPrefVelocity(a3, (1, -1))
+
+    positions_log = []
+    for step in range(200):
+        sim.doStep()
+        positions = [sim.getAgentPosition(agent_no) for agent_no in (a0, a1, a2, a3)]
+        positions_log.append(positions)
+    positions_log = np.array(positions_log)
+
+    # clear agents, reset agents, run same scenario
+    sim.clearAgents()
+
+    a0 = sim.addAgent((-1, -1))
+    a1 = sim.addAgent((1, -1))
+    a2 = sim.addAgent((1, 1))
+    a3 = sim.addAgent((-1, 1), 1.5, 5, 1.5, 2, 0.4, 2, (0, 0))
+    sim.setAgentPrefVelocity(a0, (1, 1))
+    sim.setAgentPrefVelocity(a1, (-1, 1))
+    sim.setAgentPrefVelocity(a2, (-1, -1))
+    sim.setAgentPrefVelocity(a3, (1, -1))
+
+    print('Running simulation')
+    new_positions_log = []
+    for step in range(200):
+        sim.doStep()
+        positions = [sim.getAgentPosition(agent_no) for agent_no in (a0, a1, a2, a3)]
+        new_positions_log.append(positions)
+    new_positions_log = np.array(new_positions_log)
+
+    test_passed = np.allclose(new_positions_log, positions_log)
+
+    if plotting:
+        plot_obstacles(np.array(obstacles))
+        plot_positions_log(positions_log)
+        plot_positions_log(new_positions_log)
+
+    if test_passed:
+        print("Test passed!")
+    else:
+        print("Test failed!")
+    return test_passed
+
+
 def plot_positions_log(positions_log):
     n_traj = positions_log.shape[1]
     for i in range(n_traj):
@@ -64,4 +120,5 @@ def plot_obstacles(obstacles):
 if __name__ == "__main__":
     from matplotlib import pyplot as plt
     reproduce_test_scenario(plotting=True)
+    test_clear_agents()
     plt.show()

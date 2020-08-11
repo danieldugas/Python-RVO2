@@ -366,4 +366,10 @@ namespace RVO {
 	{
 		timeStep_ = timeStep;
 	}
+
+	void RVOSimulator::clearAgents()
+	{
+		agents_.clear();
+		kdTree_->agents_.clear();
+	}
 }
