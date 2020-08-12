@@ -369,6 +369,9 @@ namespace RVO {
 
 	void RVOSimulator::clearAgents()
 	{
+		for (size_t i = 0; i < agents_.size(); ++i) {
+			delete agents_[i];
+		}
 		agents_.clear();
 		kdTree_->agents_.clear();
 	}
