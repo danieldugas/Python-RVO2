@@ -1,3 +1,4 @@
+import numpy
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext as _build_ext
 from Cython.Build import cythonize
@@ -48,4 +49,5 @@ setup(
         'Topic :: Games/Entertainment :: Simulation',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
+    include_dirs=[numpy.get_include()],
 )
